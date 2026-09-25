@@ -56,6 +56,53 @@ SQUEEGEE = """<svg class="squeegee" viewBox="0 0 62 100" aria-hidden="true">
 </svg>"""
 
 
+# Uitzicht door het raam op de homepage: Fries weiland met boerderij.
+def cow(x, y, s=1.0, flip=False):
+    f = -1 if flip else 1
+    return f"""<g transform="translate({x} {y}) scale({s * f} {s})">
+<rect x="-3" y="10" width="2" height="8" fill="#2b2b2b"/><rect x="2" y="10" width="2" height="8" fill="#2b2b2b"/>
+<rect x="15" y="10" width="2" height="8" fill="#2b2b2b"/><rect x="20" y="10" width="2" height="8" fill="#2b2b2b"/>
+<rect x="-5" y="0" width="29" height="13" rx="5" fill="#fbfbf7"/>
+<path d="M2 0h9l-2 8H1z" fill="#1f1f1f"/><ellipse cx="17" cy="5" rx="4" ry="3.5" fill="#1f1f1f"/>
+<rect x="22" y="-4" width="9" height="9" rx="3" fill="#1f1f1f"/><rect x="27" y="1" width="5" height="4" rx="2" fill="#e9b8a8"/>
+</g>"""
+
+
+VIEW_SVG = f"""<svg class="view" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<defs>
+<linearGradient id="v-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fb2e3"/><stop offset="1" stop-color="#cfeaf7"/></linearGradient>
+<linearGradient id="v-grass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8dc85a"/><stop offset="1" stop-color="#4f9a37"/></linearGradient>
+<radialGradient id="v-sun"><stop offset="0" stop-color="#fff6c7"/><stop offset=".45" stop-color="#ffe27a"/><stop offset="1" stop-color="#ffe27a" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="400" height="300" fill="url(#v-sky)"/>
+<circle cx="330" cy="58" r="46" fill="url(#v-sun)"/>
+<g class="cloud c1" fill="#fff"><ellipse cx="70" cy="60" rx="34" ry="13"/><ellipse cx="92" cy="50" rx="22" ry="15"/><ellipse cx="55" cy="52" rx="16" ry="11"/></g>
+<g class="cloud c2" fill="#fff" opacity=".9"><ellipse cx="230" cy="36" rx="28" ry="10"/><ellipse cx="246" cy="28" rx="17" ry="12"/></g>
+<g class="cloud c3" fill="#fff" opacity=".8"><ellipse cx="160" cy="98" rx="22" ry="7"/><ellipse cx="172" cy="92" rx="13" ry="8"/></g>
+<path d="M0 182 q10-14 22-6 q8-16 22-6 q12-10 20 2 q14-8 22 4 L400 180 q-12-14-26-4 q-10-12-24-2 q-12-8-20 4 L400 200 H0z" fill="#3e7a45"/>
+<g fill="#2f6a3b"><circle cx="118" cy="166" r="17"/><circle cx="134" cy="158" r="20"/><circle cx="352" cy="166" r="18"/><circle cx="368" cy="158" r="14"/></g>
+<rect x="131" y="170" width="4" height="18" fill="#4b3a2a"/>
+<rect x="0" y="186" width="400" height="114" fill="url(#v-grass)"/>
+<g>
+<polygon points="190,180 262,118 334,180" fill="#4d535c"/>
+<polygon points="262,118 334,180 318,180" fill="#3c4148"/>
+<rect x="196" y="178" width="132" height="34" fill="#a8472f"/>
+<rect x="244" y="188" width="26" height="24" fill="#2f6b4a"/>
+<path d="M244 188 L270 212 M270 188 L244 212" stroke="#fff" stroke-width="2"/>
+<rect x="150" y="168" width="48" height="44" fill="#b4523a"/>
+<polygon points="145,170 174,140 203,170" fill="#7d2e22"/>
+<g fill="#fff"><rect x="158" y="182" width="12" height="14"/><rect x="178" y="182" width="12" height="14"/><rect x="290" y="190" width="10" height="10"/><rect x="306" y="190" width="10" height="10"/></g>
+<g fill="#9fcbe0"><rect x="160" y="184" width="8" height="10"/><rect x="180" y="184" width="8" height="10"/><rect x="292" y="192" width="6" height="6"/><rect x="308" y="192" width="6" height="6"/></g>
+</g>
+<path d="M0 240 q60-8 120 0 t120 0 t160 -2 v14 q-80 6-160 2 t-120 0 t-120 0z" fill="#5aa9d6"/>
+<path d="M20 243 q40-4 80 0 M170 244 q40-4 80 0 M290 242 q40-4 80 0" stroke="#bfe3f5" stroke-width="2" fill="none" stroke-linecap="round"/>
+<g stroke="#6b5139" stroke-width="2"><path d="M0 222 H400" stroke-width="1.2"/><path d="M20 214v14M70 214v14M120 214v14M170 214v14M220 214v14M270 214v14M320 214v14M370 214v14"/></g>
+{cow(60, 206, 1.0)}
+{cow(104, 212, 0.9, True)}
+{cow(318, 262, 1.3)}
+{cow(250, 270, 1.15, True)}
+</svg>"""
+
 def brand(tag="Schoonmaken en meer…"):
     return f"""{BRAND_MARK}
 			<span><span class="brand-name">Reinmarc</span><span class="brand-tag">{tag}</span></span>"""
@@ -292,7 +339,7 @@ page(
 			<div>
 				<div class="window" data-window>
 					<div class="window-pane">
-						<img src="{W}/IMG_0012.jpg" alt="Schone ramen van een bedrijfspand" width="900" height="675">
+						{VIEW_SVG}
 						<canvas aria-hidden="true"></canvas>
 					</div>
 					{SQUEEGEE}
@@ -358,9 +405,43 @@ page(
 					<button type="button" aria-pressed="true">Leidingwater</button>
 					<button type="button" aria-pressed="false">Osmosewater</button>
 				</div>
-				<div class="demo-glass" aria-hidden="true">
-					<svg viewBox="0 0 400 250" preserveAspectRatio="none"></svg>
+				<div class="demo-stage">
+					<div class="demo-glass" aria-hidden="true">
+						<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice">
+							<defs>
+								<linearGradient id="d-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f9fd1"/><stop offset="1" stop-color="#a9d6ee"/></linearGradient>
+								<linearGradient id="d-grass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f8f3a"/><stop offset="1" stop-color="#2f6a2c"/></linearGradient>
+								<radialGradient id="d-drop" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".65" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#0a3250" stop-opacity=".38"/></radialGradient>
+								<linearGradient id="d-shine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+								<filter id="d-soft"><feGaussianBlur stdDeviation=".45"/></filter>
+							</defs>
+							<rect width="400" height="260" fill="url(#d-sky)"/>
+							<path d="M0 150 q14-22 30-8 q12-24 32-8 q16-18 30 0 q18-20 34 2 q14-16 30 0 q16-22 34-4 q14-18 30 2 q16-20 34 0 q18-16 32 4 q14-20 30-2 q16-14 26 6 q12-12 28 4 V260 H0z" fill="#2c5f34"/>
+							<rect y="186" width="400" height="74" fill="url(#d-grass)"/>
+							<rect class="d-haze" width="400" height="260" fill="#fff" fill-opacity=".14" opacity="0"/>
+							<g class="d-trails"></g>
+							<g class="d-residue" filter="url(#d-soft)"></g>
+							<g class="d-drops"></g>
+							<rect class="d-shine" x="-160" y="-40" width="120" height="340" fill="url(#d-shine)" transform="rotate(18)"/>
+						</svg>
+					</div>
+					<div class="demo-lens" aria-hidden="true">
+						<svg viewBox="0 0 120 120">
+							<defs><clipPath id="d-lens"><circle cx="60" cy="60" r="54"/></clipPath></defs>
+							<g clip-path="url(#d-lens)">
+								<rect class="lens-bg" width="120" height="120"/>
+								<g class="lens-water"></g>
+								<g class="lens-salt"></g>
+							</g>
+							<circle cx="60" cy="60" r="54" fill="none" stroke="#fff" stroke-width="6"/>
+						</svg>
+						<span>Druppel onder de loep</span>
+					</div>
 				</div>
+				<ul class="demo-legend" aria-hidden="true">
+					<li><span class="dot is-water"></span>Water</li>
+					<li class="legend-salt"><span class="dot is-salt"></span>Opgeloste zouten</li>
+				</ul>
 				<div class="demo-foot">
 					<p class="demo-result" aria-live="polite"></p>
 					<button type="button" class="btn btn-primary" data-dry>Laat het raam drogen</button>

@@ -70,9 +70,43 @@
 					<button type="button" aria-pressed="true">Leidingwater</button>
 					<button type="button" aria-pressed="false">Osmosewater</button>
 				</div>
-				<div class="demo-glass" aria-hidden="true">
-					<svg viewBox="0 0 400 250" preserveAspectRatio="none"></svg>
+				<div class="demo-stage">
+					<div class="demo-glass" aria-hidden="true">
+						<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice">
+							<defs>
+								<linearGradient id="d-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f9fd1"/><stop offset="1" stop-color="#a9d6ee"/></linearGradient>
+								<linearGradient id="d-grass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f8f3a"/><stop offset="1" stop-color="#2f6a2c"/></linearGradient>
+								<radialGradient id="d-drop" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".65" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#0a3250" stop-opacity=".38"/></radialGradient>
+								<linearGradient id="d-shine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+								<filter id="d-soft"><feGaussianBlur stdDeviation=".45"/></filter>
+							</defs>
+							<rect width="400" height="260" fill="url(#d-sky)"/>
+							<path d="M0 150 q14-22 30-8 q12-24 32-8 q16-18 30 0 q18-20 34 2 q14-16 30 0 q16-22 34-4 q14-18 30 2 q16-20 34 0 q18-16 32 4 q14-20 30-2 q16-14 26 6 q12-12 28 4 V260 H0z" fill="#2c5f34"/>
+							<rect y="186" width="400" height="74" fill="url(#d-grass)"/>
+							<rect class="d-haze" width="400" height="260" fill="#fff" fill-opacity=".14" opacity="0"/>
+							<g class="d-trails"></g>
+							<g class="d-residue" filter="url(#d-soft)"></g>
+							<g class="d-drops"></g>
+							<rect class="d-shine" x="-160" y="-40" width="120" height="340" fill="url(#d-shine)" transform="rotate(18)"/>
+						</svg>
+					</div>
+					<div class="demo-lens" aria-hidden="true">
+						<svg viewBox="0 0 120 120">
+							<defs><clipPath id="d-lens"><circle cx="60" cy="60" r="54"/></clipPath></defs>
+							<g clip-path="url(#d-lens)">
+								<rect class="lens-bg" width="120" height="120"/>
+								<g class="lens-water"></g>
+								<g class="lens-salt"></g>
+							</g>
+							<circle cx="60" cy="60" r="54" fill="none" stroke="#fff" stroke-width="6"/>
+						</svg>
+						<span>Druppel onder de loep</span>
+					</div>
 				</div>
+				<ul class="demo-legend" aria-hidden="true">
+					<li><span class="dot is-water"></span>Water</li>
+					<li class="legend-salt"><span class="dot is-salt"></span>Opgeloste zouten</li>
+				</ul>
 				<div class="demo-foot">
 					<p class="demo-result" aria-live="polite"></p>
 					<button type="button" class="btn btn-primary" data-dry>Laat het raam drogen</button>

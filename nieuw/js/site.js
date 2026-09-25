@@ -473,46 +473,188 @@
 
 	function initDemo( root ) {
 		var glass = root.querySelector( '.demo-glass' );
-		var svg = glass.querySelector( 'svg' );
+		var gDrops = root.querySelector( '.d-drops' );
+		var gTrails = root.querySelector( '.d-trails' );
+		var gResidue = root.querySelector( '.d-residue' );
+		var haze = root.querySelector( '.d-haze' );
+		var gWater = root.querySelector( '.lens-water' );
+		var gSalt = root.querySelector( '.lens-salt' );
+		var lensBg = root.querySelector( '.lens-bg' );
 		var tabs = root.querySelectorAll( '.demo-tabs button' );
 		var btn = root.querySelector( '[data-dry]' );
 		var result = root.querySelector( '.demo-result' );
 		var ns = 'http://www.w3.org/2000/svg';
 		var rnd = seeded( 42 );
 		var tap = true;
+		var frame = null;
+		var drops = [], runs = [], mols = [], salts = [];
+		var i, j;
 
-		for ( var i = 0; i < 34; i++ ) {
-			var x = 20 + rnd() * 360;
-			var y = 20 + rnd() * 210;
-			var r = 4 + rnd() * 10;
-			var spot = document.createElementNS( ns, 'circle' );
-			spot.setAttribute( 'class', 'spot' );
-			spot.setAttribute( 'cx', x );
-			spot.setAttribute( 'cy', y );
-			spot.setAttribute( 'r', r * 0.85 );
-			svg.appendChild( spot );
-			var drop = document.createElementNS( ns, 'ellipse' );
-			drop.setAttribute( 'class', 'drop' );
-			drop.setAttribute( 'cx', x );
-			drop.setAttribute( 'cy', y );
-			drop.setAttribute( 'rx', r );
-			drop.setAttribute( 'ry', r * 1.12 );
-			svg.appendChild( drop );
-		}
-		for ( var j = 0; j < 4; j++ ) {
-			var path = document.createElementNS( ns, 'path' );
-			var sx = 40 + rnd() * 320;
-			path.setAttribute( 'class', 'streak' );
-			path.setAttribute( 'd', 'M' + sx + ' 10 q ' + ( rnd() * 30 - 15 ) + ' 110 ' + ( rnd() * 20 - 10 ) + ' 230' );
-			svg.insertBefore( path, svg.firstChild );
+		function el( name, attrs, parent ) {
+			var n = document.createElementNS( ns, name );
+			for ( var k in attrs ) {
+				n.setAttribute( k, attrs[ k ] );
+			}
+			if ( parent ) {
+				parent.appendChild( n );
+			}
+			return n;
 		}
 
-		function reset() {
-			glass.classList.remove( 'is-dry' );
+		function dropShape( parent, r ) {
+			var g = el( 'g', {}, parent );
+			el( 'ellipse', { rx: r, ry: r * 1.08, fill: 'url(#d-drop)', stroke: 'rgba(255,255,255,.6)', 'stroke-width': 0.8 }, g );
+			el( 'ellipse', { cx: -r * 0.35, cy: -r * 0.42, rx: r * 0.3, ry: r * 0.18, fill: 'rgba(255,255,255,.85)' }, g );
+			return g;
+		}
+
+		// Kalkkring: de rand van een opgedroogde druppel, met wat puntjes erin.
+		function residueShape( x, y, r ) {
+			var g = el( 'g', { transform: 'translate(' + x + ' ' + y + ')', opacity: 0 }, gResidue );
+			el( 'ellipse', { rx: r * 0.92, ry: r * 0.98, fill: 'rgba(255,255,255,.22)', stroke: 'rgba(255,255,255,.75)', 'stroke-width': 1.2, 'stroke-dasharray': ( r * 1.6 ).toFixed( 1 ) + ' 1.2 ' + ( r * 0.9 ).toFixed( 1 ) + ' 0.8' }, g );
+			for ( var d = 0; d < 3; d++ ) {
+				el( 'circle', { cx: ( rnd() - 0.5 ) * r, cy: ( rnd() - 0.5 ) * r, r: 0.6, fill: 'rgba(255,255,255,.8)' }, g );
+			}
+			return g;
+		}
+
+		// Losse druppels op het glas
+		for ( i = 0; i < 34; i++ ) {
+			var x = 12 + rnd() * 376;
+			var y = 12 + rnd() * 236;
+			var r = rnd() < 0.7 ? 2 + rnd() * 3.5 : 5 + rnd() * 5;
+			var g = dropShape( gDrops, r );
+			drops.push( { x: x, y: y, g: g, res: residueShape( x, y, r ) } );
+		}
+
+		// Druppels die naar beneden lopen en een spoor achterlaten
+		for ( i = 0; i < 6; i++ ) {
+			var x0 = 30 + rnd() * 340;
+			var y0 = 8 + rnd() * 60;
+			var len = 80 + rnd() * 130;
+			var d = 'M' + x0.toFixed( 1 ) + ' ' + y0.toFixed( 1 );
+			var cx = x0;
+			for ( j = 1; j <= 10; j++ ) {
+				cx += ( rnd() - 0.5 ) * 5;
+				d += ' L' + cx.toFixed( 1 ) + ' ' + ( y0 + len * j / 10 ).toFixed( 1 );
+			}
+			var w = 3 + rnd() * 2;
+			var wet = el( 'path', { d: d, fill: 'none', stroke: 'rgba(255,255,255,.32)', 'stroke-width': w, 'stroke-linecap': 'round' }, gTrails );
+			var plen = wet.getTotalLength();
+			wet.setAttribute( 'stroke-dasharray', plen );
+			var chalk = el( 'g', { opacity: 0 }, gResidue );
+			el( 'path', { d: d, fill: 'none', stroke: 'rgba(255,255,255,.22)', 'stroke-width': w + 1.5, 'stroke-linecap': 'round' }, chalk );
+			el( 'path', { d: d, fill: 'none', stroke: 'rgba(255,255,255,.7)', 'stroke-width': 1, 'stroke-linecap': 'round' }, chalk );
+			var head = dropShape( gDrops, w * 1.25 );
+			var end = wet.getPointAtLength( plen );
+			runs.push( { wet: wet, len: plen, chalk: chalk, head: head, res: residueShape( end.x, end.y + 2, w * 1.3 ) } );
+		}
+
+		// Uitvergrote druppel: watermoleculen en opgeloste zouten
+		for ( i = 0; i < 38; i++ ) {
+			var a = rnd() * Math.PI * 2, rr = Math.sqrt( rnd() ) * 48;
+			var mg = el( 'g', {}, gWater );
+			el( 'circle', { r: 3.4, style: 'animation-delay:-' + ( rnd() * 1.1 ).toFixed( 2 ) + 's' }, mg );
+			mols.push( { x: 60 + Math.cos( a ) * rr, y: 60 + Math.sin( a ) * rr, g: mg, v: 0.6 + rnd() * 0.8 } );
+		}
+		for ( i = 0; i < 12; i++ ) {
+			var sa = rnd() * Math.PI * 2, sr = Math.sqrt( rnd() ) * 40;
+			var sg = el( 'g', {}, gSalt );
+			el( 'polygon', { points: '0,-4.6 4.6,0 0,4.6 -4.6,0', style: 'animation-delay:-' + ( rnd() * 1.1 ).toFixed( 2 ) + 's' }, sg );
+			// Na het drogen blijven de zouten in een kringetje liggen
+			var ea = ( i / 12 ) * Math.PI * 2 + rnd() * 0.3;
+			salts.push( { x: 60 + Math.cos( sa ) * sr, y: 60 + Math.sin( sa ) * sr, ex: 60 + Math.cos( ea ) * 30, ey: 60 + Math.sin( ea ) * 30, g: sg } );
+		}
+
+		function mix( a, b, t ) {
+			return a + ( b - a ) * t;
+		}
+
+		// t = hoe ver het drogen is (0 = nat, 1 = droog); run = hoe ver de druppels gelopen zijn
+		function render( t, run ) {
+			var k, p, s;
+			var res = tap ? t : 0;
+			haze.setAttribute( 'opacity', res );
+			drops.forEach( function( dr ) {
+				s = Math.max( 0.001, 1 - t );
+				dr.g.setAttribute( 'transform', 'translate(' + dr.x + ' ' + dr.y + ') scale(' + s + ')' );
+				dr.g.setAttribute( 'opacity', 1 - t * t );
+				dr.res.setAttribute( 'opacity', res );
+			} );
+			runs.forEach( function( rn ) {
+				p = rn.wet.getPointAtLength( rn.len * run );
+				s = Math.max( 0.001, 1 - t );
+				rn.head.setAttribute( 'transform', 'translate(' + p.x + ' ' + p.y + ') scale(' + s + ')' );
+				rn.wet.setAttribute( 'stroke-dashoffset', rn.len * ( 1 - run ) );
+				rn.wet.setAttribute( 'opacity', 1 - t );
+				rn.chalk.setAttribute( 'opacity', res );
+				rn.res.setAttribute( 'opacity', res );
+			} );
+			mols.forEach( function( m ) {
+				m.g.setAttribute( 'transform', 'translate(' + m.x + ' ' + ( m.y - t * 90 * m.v ) + ')' );
+				m.g.setAttribute( 'opacity', Math.max( 0, 1 - t * 1.4 ) );
+			} );
+			salts.forEach( function( sl ) {
+				k = t * t * ( 3 - 2 * t );
+				sl.g.setAttribute( 'transform', 'translate(' + mix( sl.x, sl.ex, k ) + ' ' + mix( sl.y, sl.ey, k ) + ')' );
+			} );
+			lensBg.style.fill = t > 0.6 ? '#eef6fa' : '';
+		}
+
+		function animate( dur, fn, done ) {
+			cancelAnimationFrame( frame );
+			if ( reduceMotion ) {
+				fn( 1 );
+				if ( done ) {
+					done();
+				}
+				return;
+			}
+			var t0 = null;
+			function step( ts ) {
+				if ( t0 === null ) {
+					t0 = ts;
+				}
+				var t = Math.min( 1, ( ts - t0 ) / dur );
+				fn( t );
+				if ( t < 1 ) {
+					frame = requestAnimationFrame( step );
+				} else if ( done ) {
+					done();
+				}
+			}
+			frame = requestAnimationFrame( step );
+		}
+
+		function makeWet() {
+			glass.classList.remove( 'is-sparkle' );
+			root.classList.toggle( 'is-osmose', ! tap );
+			gSalt.style.display = tap ? '' : 'none';
 			btn.textContent = 'Laat het raam drogen';
+			btn.disabled = false;
 			result.textContent = tap ?
-				'Nat raam, gewassen met gewoon leidingwater. Wat blijft er over als het opdroogt?' :
+				'Nat raam, gewassen met gewoon leidingwater. In het water zitten opgeloste zouten. Wat blijft er over als het opdroogt?' :
 				'Nat raam, gewassen met osmosewater. Wat blijft er over als het opdroogt?';
+			animate( 1300, function( p ) {
+				render( 0, 1 - Math.pow( 1 - p, 2 ) );
+			} );
+		}
+
+		function makeDry() {
+			btn.disabled = true;
+			animate( 3000, function( p ) {
+				render( p * p * ( 3 - 2 * p ), 1 );
+			}, function() {
+				btn.disabled = false;
+				btn.textContent = 'Opnieuw nat maken';
+				result.textContent = tap ?
+					'Bij de verdamping van gewoon leidingwater blijven de opgeloste zouten achter waardoor je strepen krijgt.' :
+					'Omdat deze in osmosewater niet meer aanwezig zijn krijg je een streeploos resultaat.';
+				if ( ! tap && ! reduceMotion ) {
+					glass.classList.add( 'is-sparkle' );
+				}
+				root.dataset.dry = '1';
+			} );
 		}
 
 		tabs.forEach( function( t, idx ) {
@@ -520,25 +662,26 @@
 				tap = idx === 0;
 				tabs[0].setAttribute( 'aria-pressed', tap ? 'true' : 'false' );
 				tabs[1].setAttribute( 'aria-pressed', tap ? 'false' : 'true' );
-				glass.classList.toggle( 'is-tap', tap );
-				reset();
+				delete root.dataset.dry;
+				makeWet();
 			} );
 		} );
 
 		btn.addEventListener( 'click', function() {
-			if ( glass.classList.contains( 'is-dry' ) ) {
-				reset();
-				return;
+			if ( root.dataset.dry ) {
+				delete root.dataset.dry;
+				makeWet();
+			} else {
+				makeDry();
 			}
-			glass.classList.add( 'is-dry' );
-			btn.textContent = 'Opnieuw nat maken';
-			result.textContent = tap ?
-				'Bij de verdamping van gewoon leidingwater blijven de opgeloste zouten achter waardoor je strepen krijgt.' :
-				'Omdat deze in osmosewater niet meer aanwezig zijn krijg je een streeploos resultaat.';
 		} );
 
-		glass.classList.add( 'is-tap' );
-		reset();
+		render( 0, 0 );
+		if ( reduceMotion || ! ( 'IntersectionObserver' in window ) ) {
+			makeWet();
+		} else {
+			root.addEventListener( 'revealed', makeWet );
+		}
 	}
 
 	/* ---------- Fotoviewer portfolio ---------- */
