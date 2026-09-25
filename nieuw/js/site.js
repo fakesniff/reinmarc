@@ -432,7 +432,6 @@
 	document.querySelectorAll( '.ba' ).forEach( function( ba ) {
 		var buttons = ba.querySelectorAll( '.ba-switch button' );
 		var label = ba.querySelector( '.ba-label' );
-		var touched = false;
 
 		function show( after ) {
 			ba.classList.toggle( 'show-after', after );
@@ -442,25 +441,13 @@
 		}
 
 		buttons[0].addEventListener( 'click', function() {
-			touched = true;
 			show( false );
 		} );
 		buttons[1].addEventListener( 'click', function() {
-			touched = true;
 			show( true );
 		} );
 		ba.querySelector( '.ba-frame' ).addEventListener( 'click', function() {
-			touched = true;
 			show( ! ba.classList.contains( 'show-after' ) );
-		} );
-
-		// Laat één keer zien wat het verschil is.
-		ba.addEventListener( 'revealed', function() {
-			setTimeout( function() {
-				if ( ! touched ) {
-					show( true );
-				}
-			}, 1400 );
 		} );
 	} );
 
