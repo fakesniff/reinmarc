@@ -1,0 +1,28 @@
+# Instellingen voor de statische website van reinmarc.nl
+
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+Options -Indexes
+
+RewriteEngine On
+
+# Altijd via https en zonder www
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^ https://reinmarc.nl%{REQUEST_URI} [R=301,L]
+
+# Oude WordPress-links (?page_id=...) naar de nieuwe pagina's
+RewriteCond %{QUERY_STRING} (^|&)page_id=6(&|$)
+RewriteRule ^(index\.php)?$ / [R=301,L,QSD]
+RewriteCond %{QUERY_STRING} (^|&)page_id=161(&|$)
+RewriteRule ^(index\.php)?$ /osmose-glasbewassing/ [R=301,L,QSD]
+RewriteCond %{QUERY_STRING} (^|&)page_id=171(&|$)
+RewriteRule ^(index\.php)?$ /portfolio/ [R=301,L,QSD]
+RewriteCond %{QUERY_STRING} (^|&)page_id=17(&|$)
+RewriteRule ^(index\.php)?$ /contact/ [R=301,L,QSD]
+RewriteCond %{QUERY_STRING} (^|&)page_id=27(&|$)
+RewriteRule ^(index\.php)?$ /contact/27-2/ [R=301,L,QSD]
+
+# Onderdelen van WordPress die niet meer bestaan
+RewriteRule ^(feed|comments/feed)/?$ - [G,L]
+RewriteRule ^(wp-login\.php|xmlrpc\.php|wp-admin) - [G,L]
